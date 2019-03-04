@@ -1,0 +1,16 @@
+---
+title: 'Homework #4'
+author: "Jacob Shoemaker; jshoemaker2249"
+date: "3/3/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+install.packages('datasets')
+library(datasets)
+```
