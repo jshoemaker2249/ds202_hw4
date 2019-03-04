@@ -11,6 +11,39 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(dplyr)
-install.packages('datasets')
 library(datasets)
+
+ChickWeight <- ChickWeight
 ```
+
+1. Get a frequency breakdown of the number of chicks, their average weight and the standard deviation of the weights in each of the diets at the start of the study. Store the resulting data frame in a variable named weight0 and print.
+
+```{r}
+weight0 <- ChickWeight %>% group_by(Diet) %>%
+  filter(Time == 0) %>%
+  summarize(numChicks = n_distinct(Chick), 
+            avgweight = mean(weight, na.rm = TRUE), 
+            sdweight = sd(weight, na.rm = TRUE))
+weight0
+```
+
+
+2. Each chick should have twelve weight measurements. Use the dplyr package to identify how many measurements are there for each chick. Extract a subset of the data for all chicks with complete information, name the data set complete, and print the first 3 rows. (Hint: you might want to use mutate to introduce a helper variable consisting of the number of observations)
+```{r}
+complete <- ChickWeight %>%
+  group_by(Chick) %>%
+  mutate(numObs = n()) %>%
+  filter(numObs == 12)
+
+select(complete, -numObs) %>% head(3)
+```
+
+
+3. In the complete data set introduce a new variable that measures the current weight difference compared to day 0. Name this variable  weightgain and print the first 3 rows of the new data frame.
+```{r}
+complete <- complete %>%
+    group_by(Chick)
+```
+
+
+4. 
