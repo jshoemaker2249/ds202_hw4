@@ -12,7 +12,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(dplyr)
 library(datasets)
+```
 
+```{r}
 ChickWeight <- ChickWeight
 ```
 
@@ -22,8 +24,8 @@ ChickWeight <- ChickWeight
 weight0 <- ChickWeight %>% group_by(Diet) %>%
   filter(Time == 0) %>%
   summarize(numChicks = n_distinct(Chick), 
-            avgweight = mean(weight, na.rm = TRUE), 
-            sdweight = sd(weight, na.rm = TRUE))
+            AvgWeight = mean(weight, na.rm = TRUE), 
+            SDWeight = sd(weight, na.rm = TRUE))
 weight0
 ```
 
@@ -35,15 +37,73 @@ complete <- ChickWeight %>%
   mutate(numObs = n()) %>%
   filter(numObs == 12)
 
-select(complete, -numObs) %>% head(3)
+complete <- select(complete, -numObs)
+head(complete, 3)
 ```
 
 
 3. In the complete data set introduce a new variable that measures the current weight difference compared to day 0. Name this variable  weightgain and print the first 3 rows of the new data frame.
 ```{r}
 complete <- complete %>%
-    group_by(Chick)
+    group_by(Chick) %>%
+  mutate(weight0 = weight[Time == 0]) %>%
+  mutate(weightgain = weight- weight0)
+
+complete <- select(complete, -weight0)
+head(complete, 3)
 ```
 
 
-4. 
+4. Use {ggplot2} to create side-by-side boxplots of weightgain by Diet for day 21. Describe the relationship in 2-3 sentences. Change the order of the categories in the Diet variable such that the boxplots are ordered by median weightgain, and the lower limit of the y axis should be 0.
+```{r}
+#install.packages("ggplot2")
+library(ggplot2)
+
+day21 <- filter(complete, Time == 21)
+ggplot(day21, aes(x=reorder(Diet, weightgain, FUN= median), y= weightgain)) + geom_boxplot() + ylim(0, max(day21$weightgain)) + xlab("Diet Category") + ylab("Weight Gain")
+```
+
+
+After examining the boxplots, it is clear that Diet 3 is the most effective in terms of weight gain. However, Diet 4 could be considered most consistent across a chick population, at the arms of the boxplot (particularly the lower bounds) are substantially smaller. Diet 1 had the smallest median weight gain in comparison to the other 3 diets.
+
+5. Answer the following question using numerical and graphical summary: Which chick gained the most weight and which gained the least weight? What diets were they on?
+```{r}
+
+most <- day21 %>% arrange(desc(weightgain))
+head(most, 1)
+
+least <- day21 %>% arrange(weightgain)
+head(least, 1)
+
+day21$Chick <- as.numeric(levels(day21$Chick))[day21$Chick]
+ggplot(day21, aes(x=Chick, y=weightgain, color= Diet)) + geom_point() + scale_x_continuous(breaks = seq(0,50,by = 2)) + ylab("Weight Gain") + xlab("Chick Number")
+```
+
+
+From the numerical analysis, one can see Chick 35 gained the most weight, while Chick 24 gained the least. The graphical analysis shows that Chick 35 was on Diet 3, while Chick 24 was on Diet 2.
+
+
+6. For the chicks with the least and the most weight at time 0, plot their growth trajectories over time. 
+```{r}
+time0 <- ChickWeight %>% filter(Time == 0) %>% arrange(desc(weight))
+
+head(time0, 1)
+tail(time0, 1)
+```
+
+
+As we can see, Chick 3 weighed the most, and Chick 48 weighed least. We can use this information to construct new data frames.
+```{r}
+chicks <- ChickWeight %>% filter(Chick == 3 | Chick == 48) %>% arrange(Time)
+
+ggplot(chicks, aes(x= Time, y= weight, color= Chick))+geom_point() + ggtitle("Chick Weight Minimum and Maximum at birth over time") + ylab("Weight")
+```
+
+
+As you can see, even though Chick 48 weighed less at birth, it quickly surpassed Chick 3, which weighed most.
+
+
+7. What else do you find interesting in the dataset? Show your exploratory analysis.
+```{r}
+
+```
