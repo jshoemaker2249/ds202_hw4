@@ -105,5 +105,9 @@ As you can see, even though Chick 48 weighed less at birth, it quickly surpassed
 
 7. What else do you find interesting in the dataset? Show your exploratory analysis.
 ```{r}
-
+avgs <- complete %>% group_by(Time) %>% mutate(avgGain = mean(weightgain))
+ggplot(avgs, aes(x=Time, y=avgGain)) + geom_line() + ggtitle("Average Weight Gain Over Time") + ylab("Average Weight Gain")
 ```
+
+
+I wanted to see if weight gain over time was consistent, on average. To do this, I introduced a new column that had the average weight gain of all chicks at that specific time point. Then, I plotted this with a line chart. As you can see, weight gain briefly plateaus at Time = 12, in comparison to previous growth. However, it then proceeds to jump up again, similar to this flatter point.
